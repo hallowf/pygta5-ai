@@ -1,7 +1,10 @@
 import time
 import numpy as np
+from numpy.linalg import lstsq
 import cv2
 import mss
+from statistics import mean
+
 # mss is faster than PIL
 sct = mss.mss()
 
@@ -16,7 +19,7 @@ def roi(img, verts):
     return masked
 
 
-def draw_lines(img, lines, color=[0,255,255], thickness=3):
+def draw_lanes(img, lines, color=[0,255,255], thickness=3):
     try:
         ys = []
         for i in lines:
@@ -31,7 +34,7 @@ def draw_lines(img, lines, color=[0,255,255], thickness=3):
             for xyxy in i:
                 x_coords = (xyxy[0],xyxy[2])
                 y_coords= [xyxy[1],xyxy[3]]
-                A = vstack([x_coords,ones(len(x_coords))]).T
+                A = np.vstack([x_coords,np.ones(len(x_coords))]).T
                 m, b = lstsq(A, y_coords)[0]
 
                 x1 = (min_y-b) / m
@@ -147,13 +150,13 @@ def main():
 
     lst = time.time()
     while(True):
-        screen_pil = np.array(sct.grab((0,40,800,640)))
-        new_screen = process_img(screen_pil)
+        screen = np.array(sct.grab((0,40,800,640)))
+        new_screen = process_img(screen)
         print("Loop took {}".format((time.time()-lst)))
         lst = time.time()
         new_screen,original_image = process_img(screen)
-        cv2.imshow('window', new_screen)
-        cv2.imshow('window2',cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
+        # cv2.imshow('window', new_screen)
+        # cv2.imshow('window2',cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
         #cv2.imshow('window',cv2.cvtColor(screen, cv2.COLOR_BGR2RGB))
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
