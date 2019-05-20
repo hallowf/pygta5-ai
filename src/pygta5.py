@@ -4,6 +4,7 @@ from numpy.linalg import lstsq
 import cv2
 import mss
 from statistics import mean
+import keyboard
 
 # mss is faster than PIL
 sct = mss.mss()
@@ -91,7 +92,7 @@ def draw_lanes(img, lines, color=[0,255,255], thickness=3):
         l1_x1, l1_y1, l1_x2, l1_y2 = average_lane(final_lanes[lane1_id])
         l2_x1, l2_y1, l2_x2, l2_y2 = average_lane(final_lanes[lane2_id])
 
-        return [l1_x1, l1_y1, l1_x2, l1_y2], [l2_x1, l2_y1, l2_x2, l2_y2]
+        return [l1_x1, l1_y1, l1_x2, l1_y2], [l2_x1, l2_y1, l2_x2, l2_y2], lane1_id, lane2_id
     except Exception as e:
         print(str(e))
 
@@ -121,8 +122,10 @@ def process_img(image):
     # more info: http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_houghlines/py_houghlines.html
     #                                     rho   theta   thresh  min length, max gap:
     lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180,      20,       15)
+    m1 = 0
+    m2 = 0
     try:
-        l1, l2 = draw_lanes(original_image,lines)
+        l1, l2, m1, m2 = draw_lanes(original_image,lines)
         cv2.line(original_image, (l1[0], l1[1]), (l1[2], l1[3]), [0,255,0], 30)
         cv2.line(original_image, (l2[0], l2[1]), (l2[2], l2[3]), [0,255,0], 30)
     except Exception as e:
@@ -140,7 +143,28 @@ def process_img(image):
     except Exception as e:
         pass
 
-    return processed_img,original_image
+    return processed_img,original_image, m1, m2
+
+
+def go_straight():
+    keyboard.press("w")
+    keyboard.release("a")
+    keyboard.release("d")
+
+def go_left():
+    keyboard.press("a")
+    keyboard.release("w")
+    keyboard.release("d")
+
+def go_right():
+    keyboard.press("d")
+    keyboard.release("a")
+    keyboard.release("w")
+
+def slow_down():
+    keyboard.release("w")
+    keyboard.release("a")
+    keyboard.release("d")
 
 
 def main():
@@ -153,9 +177,17 @@ def main():
         screen = np.array(sct.grab((0,40,800,640)))
         print("Loop took {}".format((time.time()-lst)))
         lst = time.time()
-        new_screen,original_image = process_img(screen)
+        new_screen,original_image,m1,m2 = process_img(screen)
         # cv2.imshow('window', new_screen)
-        # cv2.imshow('window2',cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
+        cv2.imshow('window2',cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
+
+        if m1 < 0 and m2 < 0:
+            go_right()
+        elif m1 > 0 and m2 > 0:
+            go_left()
+        else:
+            go_straight()
+
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
             break
