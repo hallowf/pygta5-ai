@@ -1,3 +1,6 @@
+import mss
+import cv2
+
 def main():
     for i in list(range(4))[::-1]:
         print(i+1)
