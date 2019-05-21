@@ -1,4 +1,4 @@
-import time
+import time, timeit
 import mss
 import cv2
 import numpy as np
@@ -9,15 +9,9 @@ def grab_screen(region=(0,40,800,640)):
 
     hwin = win32gui.GetDesktopWindow()
 
-    if region:
-            left,top,x2,y2 = region
-            width = x2 - left + 1
-            height = y2 - top + 1
-    else:
-        width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
-        height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
-        left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
-        top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
+    left,top,x2,y2 = region
+    width = x2 - left + 1
+    height = y2 - top + 1
 
     hwindc = win32gui.GetWindowDC(hwin)
     srcdc = win32ui.CreateDCFromHandle(hwindc)
@@ -36,7 +30,7 @@ def grab_screen(region=(0,40,800,640)):
     win32gui.ReleaseDC(hwin, hwindc)
     win32gui.DeleteObject(bmp.GetHandle())
 
-    return cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
+    return img
 
 def winapi_test():
     # vals = []
@@ -59,8 +53,20 @@ def winapi_test():
     # print(mean(vals))
 
 
+def winapi_timeit_test():
+    print("winapi timeit test")
+    for i in list(range(200))[::-1]:
+        screen_pil = np.array(grab_screen())
+
+
+def mss_timeit_test():
+    print("mss timeit test")
+    sct = mss.mss()
+    for i in list(range(200))[::-1]:
+        screen_pil = np.array(sct.grab((0,40,800,640)))
+
 def mss_test():
-    vals = []
+    # vals = []
     sct = mss.mss()
     for i in list(range(4))[::-1]:
         print(i+1)
@@ -81,8 +87,5 @@ def mss_test():
     # print(mean(vals))
 
 if __name__ == '__main__':
-    # mss ~~0.06409240908183335
-    # winapi ~~0.06700372695922852
-    # mss with mean 0.06502873063087464
-    # winapi with mean 0.07244414329528809
-    winapi_test()
+    # winapi_test()
+    print(timeit.timeit("winapi_timeit_test()", number=3, setup="from __main__ import winapi_timeit_test"))
