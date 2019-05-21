@@ -1,1 +1,7 @@
-venv 
+venv
+.npy
+__pycache__
+env
+.h5
+Graph
+training

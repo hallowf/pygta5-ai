@@ -1,6 +1,6 @@
 opencv-python
 pandas
-numpy
+numpy==1.16.1
 mss
 Pillow
 keyboard
