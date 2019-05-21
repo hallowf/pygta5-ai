@@ -7,6 +7,7 @@ import time
 from directkeys import PressKey,ReleaseKey, W, A, S, D
 from alexnet import alexnet
 from getkeys import key_check
+import keyboard
 
 import random
 
@@ -43,7 +44,7 @@ def right():
     #ReleaseKey(D)
     time.sleep(t_time)
     ReleaseKey(D)
-    
+
 model = alexnet(WIDTH, HEIGHT, LR)
 model.load(MODEL_NAME)
 
@@ -55,7 +56,7 @@ def main():
 
     paused = False
     while(True):
-        
+
         if not paused:
             # 800x600 windowed mode
             #screen =  np.array(ImageGrab.grab(bbox=(0,40,800,640)))
@@ -80,28 +81,8 @@ def main():
             else:
                 straight()
 
-        keys = key_check()
+        if keyboard.is_pressed("t"):
+            paused = True
+            break
 
-        # p pauses game and can get annoying.
-        if 'T' in keys:
-            if paused:
-                paused = False
-                time.sleep(1)
-            else:
-                paused = True
-                ReleaseKey(A)
-                ReleaseKey(W)
-                ReleaseKey(D)
-                time.sleep(1)
-
-main()       
-
-
-
-
-
-
-
-
-
-
+main()
