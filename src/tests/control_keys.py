@@ -1,6 +1,8 @@
 import time
 import keyboard
 
+## keyboard works fine for sending keypresses
+
 for i in list(range(4))[::-1]:
     print(i+1)
     time.sleep(1)
