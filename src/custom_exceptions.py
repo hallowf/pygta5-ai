@@ -13,3 +13,7 @@ class InvalidOptimizer(Exception):
 class InvalidNetworkType(Exception):
     def __init__(self,*args,**kwargs):
         Exception.__init__(self,*args,**kwargs)
+
+class InvalidBackend(Exception):
+    def __init__(self,*args,**kwargs):
+        Exception.__init__(self,*args,**kwargs)

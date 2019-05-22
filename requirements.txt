@@ -6,3 +6,4 @@ keyboard
 tflearn
 keras
 tensorflow
+scikit-learn

@@ -59,7 +59,7 @@ class Watcher(object):
         for i in list(range(4))[::-1]:
             print(i+1)
             time.sleep(1)
-        lst = time.time()
+        # lst = time.time()
         while(True):
             if keyboard.is_pressed("t"):
                 raise UserInterrupt("Stoping recorder")
@@ -69,8 +69,8 @@ class Watcher(object):
             keys = self.key_check()
             output = self.keys_to_output(keys)
             self.training_data.append([screen, output])
-            print("Loop took {}".format((time.time()-lst)))
-            lst = time.time()
+            # print("Loop took {}".format((time.time()-lst)))
+            # lst = time.time()
             if len(self.training_data) % 500 == 0:
                 print("Saving data")
                 np.save(self.file_name, self.training_data)
@@ -81,7 +81,7 @@ class Watcher(object):
         for i in list(range(4))[::-1]:
             print(i+1)
             time.sleep(1)
-        lst = time.time()
+        # lst = time.time()
         while(True):
             if keyboard.is_pressed("t"):
                 raise UserInterrupt("Stoping recorder")
@@ -98,8 +98,8 @@ class Watcher(object):
             else:
                 output = [0,0,0]
             self.training_data.append([screen, output])
-            print("Loop took {}".format((time.time()-lst)))
-            lst = time.time()
+            # print("Loop took {}".format((time.time()-lst)))
+            # lst = time.time()
             if len(self.training_data) % 500 == 0:
                 print("Saving data")
                 np.save(self.file_name, self.training_data)
