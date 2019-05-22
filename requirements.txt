@@ -2,6 +2,7 @@ opencv-python
 pandas
 numpy==1.16.1
 mss
-Pillow
 keyboard
 tflearn
+keras
+tensorflow

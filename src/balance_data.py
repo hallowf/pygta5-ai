@@ -6,6 +6,11 @@ from random import shuffle
 
 from custom_exceptions import MissingDataSet
 
+# this https://keras.io/preprocessing/image/#flow
+# takes data & label arrays, generates batches of augmented data.
+# or https://keras.io/preprocessing/image/#flow_from_dataframe
+# Takes the dataframe and the path to a directory and generates batches of augmented/normalized data.
+# might be usefull
 class Balancer(object):
     """docstring for Balancer."""
 
@@ -65,9 +70,15 @@ class Balancer(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Capture training data')
-    parser.add_argument("identifier", type=str, help='An identifier for training data file')
-    parser.add_argument("--no-shuffle", help="Shuffles training data", action="store_false")
+    parser.add_argument("identifier", type=str, help='An identifier for training data filename')
+    parser.add_argument("--no-shuffle", help="if used training data isn't shuffled", action="store_false")
     args = parser.parse_args()
     print("Balancing data shuffle:%s" % args.no_shuffle)
-    Balancer(args.identifier).balance(args.no_shuffle)
+    try:
+        Balancer(args.identifier).balance(args.no_shuffle)
+    except (MissingDataSet,Exception) as e:
+        en = e.__class__.__name__
+        if en != "MissingDataSet":
+            print("\n\nUnexpected exception occured\n\n")
+        raise e
     sys.exit(0)

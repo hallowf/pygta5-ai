@@ -13,8 +13,8 @@ from custom_exceptions import UserInterrupt
 sct = mss.mss()
 
 
-class Trainer(object):
-    """docstring for Trainer."""
+class Watcher(object):
+    """Captures images and keypresses and generates training data"""
 
     def __init__(self, identifier):
         super(Trainer, self).__init__()
@@ -22,24 +22,15 @@ class Trainer(object):
         self.identifier = identifier
         self.file_name = "training/training_data_{}.npy".format(self.identifier)
         self.training_data = None
-        self.keyList = ["\b", " "]
-        self.key_list = ["space"]
-        for char in "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789":
+        self.key_list = ["\b", " "]
+        for char in "ABCDEFGHIJKLMNOPQRSUVWXYZ123456789":
             self.keyList.append(char)
-            self.key_list.append(char.lower())
         self.check_training_data()
 
     def key_check(self):
         keys = []
-        for key in self.keyList:
-            if wapi.GetAsyncKeyState(ord(key)):
-                keys.append(key)
-        return keys
-
-    def keyboard_check(self):
-        keys = []
         for key in self.key_list:
-            if keyboard.is_pressed(key):
+            if wapi.GetAsyncKeyState(ord(key)):
                 keys.append(key)
         return keys
 
@@ -85,6 +76,8 @@ class Trainer(object):
                 np.save(self.file_name, self.training_data)
 
     def exp_record(self):
+        """Experimental recording uses keyboard directly
+            instead of calling secondary function"""
         for i in list(range(4))[::-1]:
             print(i+1)
             time.sleep(1)
@@ -100,7 +93,7 @@ class Trainer(object):
                 output = [1,0,0]
             elif keyboard.is_pressed("w"):
                 output = [0,1,0]
-            else:
+            elif keyboard.is_pressed("d"):
                 output = [0,0,1]
             self.training_data.append([screen, output])
             print("Loop took {}".format((time.time()-lst)))
@@ -119,14 +112,14 @@ if __name__ == '__main__':
         help="Experimental recorder uses keyboard directly on main loop instead of win32api", action="store_true")
     args = parser.parse_args()
     try:
-        t = Trainer(args.identifier)
+        t = Watcher(args.identifier)
         if args.exp_record:
             t.exp_record()
         else:
             t.record()
     except (Exception, UserInterrupt) as e:
-        ex_name = e.__class__.__name__
-        if ex_name == "UserInterrupt":
+        en = e.__class__.__name__
+        if en == "UserInterrupt":
             print("Interrupt detected exiting now")
             sys.exit(0)
         else:
