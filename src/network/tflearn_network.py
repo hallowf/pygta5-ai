@@ -1,5 +1,4 @@
 import numpy as np
-from network.alexnet import alexnet
 import keras
 
 from network.tflearn_models import TFModelBuilder
@@ -29,7 +28,7 @@ class MainframeTFLearn(object):
         else:
             self.training_data = np.load(self.training_data_name)
 
-    def start(self):
+    def run(self):
         ## input image dimensions
         img_x, img_y = 160, 120
         input_shape = (img_x,img_y)

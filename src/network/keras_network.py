@@ -60,7 +60,7 @@ class MainframeKeras(object):
             del optimizers
             return optimizer
 
-    def start(self):
+    def run(self):
         ## input image dimensions
         img_x, img_y = 160, 120
         input_shape = (img_x, img_y, 1)
