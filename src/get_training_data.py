@@ -17,14 +17,14 @@ class Watcher(object):
     """Captures images and keypresses and generates training data"""
 
     def __init__(self, identifier):
-        super(Trainer, self).__init__()
+        super(Watcher, self).__init__()
         self.train_counter = 0
         self.identifier = identifier
         self.file_name = "training/training_data_{}.npy".format(self.identifier)
         self.training_data = None
         self.key_list = ["\b", " "]
         for char in "ABCDEFGHIJKLMNOPQRSUVWXYZ123456789":
-            self.keyList.append(char)
+            self.key_list.append(char)
         self.check_training_data()
 
     def key_check(self):

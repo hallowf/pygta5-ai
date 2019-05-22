@@ -52,7 +52,6 @@ class MainframeKeras(object):
             "Nadam": Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
         }
         if optimizer not in list(self.optimizers.keys()):
-            sys.stdout.write("Invalid optimizer: %s\n" % optimizer)
             raise InvalidOptimizer("%s" % optimizer)
         else:
             optimizer = optimizers[optimizer]
