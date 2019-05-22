@@ -95,6 +95,8 @@ class Watcher(object):
                 output = [0,1,0]
             elif keyboard.is_pressed("d"):
                 output = [0,0,1]
+            else:
+                output = [0,0,0]
             self.training_data.append([screen, output])
             print("Loop took {}".format((time.time()-lst)))
             lst = time.time()
