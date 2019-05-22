@@ -34,9 +34,9 @@ class Trainer(object):
                 self.mainframe(self.identifier, self.network_type).run()
         else:
             if self.lr:
-                self.mainframe(self.identifier, self.network_type, self.lr)
+                self.mainframe(self.identifier, self.network_type, self.lr).run()
             else:
-                self.mainframe(self.identifier, self.network_type)
+                self.mainframe(self.identifier, self.network_type).run()
 
 
 if __name__ == "__main__":
