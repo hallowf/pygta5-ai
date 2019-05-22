@@ -25,7 +25,7 @@ class MainframeKeras(object):
         # create model name and trainind data name
         self.training_data = None
         self.training_data_name = "training/training_data_%s_balanced.npy" % identifier
-        self.model_name = "trained_models/%s_%s_%s.h5" % (self.network_type, self.optimizer, identifier)
+        self.model_name = "trained_models/%s_%s_%s.h5" % (identifier,self.network_type, self.optimizer)
         # load the training_data
         self.load_training_data = load_training_data()
         # Map the optimizer and get rid of the others
@@ -80,7 +80,7 @@ class MainframeKeras(object):
         model.compile(loss="categorical_crossentropy", optimizer=self.optzr, metrics=['accuracy'])
 
         # Create graph dir if necessary
-        graph_dir = "./Graph/%s/%s" % (self.network_type,self.optimizer)
+        graph_dir = "./Graph/%s/%s/%s" % (self.identifier,self.network_type,self.optimizer)
         if not os.path.isdir(graph_dir):
             os.makedirs(graph_dir, exist_ok=True)
 
