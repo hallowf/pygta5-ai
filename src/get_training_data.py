@@ -77,7 +77,7 @@ class Watcher(object):
 
     def exp_record(self):
         """Experimental recording uses keyboard directly
-            instead of calling secondary function"""
+            instead of calling secondary functions"""
         for i in list(range(4))[::-1]:
             print(i+1)
             time.sleep(1)
@@ -85,7 +85,7 @@ class Watcher(object):
         while(True):
             if keyboard.is_pressed("t"):
                 raise UserInterrupt("Stoping recorder")
-            output = None
+            output = [0,0,0]
             screen = np.array(sct.grab((0,40,800,640)))
             screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
             screen = cv2.resize(screen, (160,120))
@@ -108,7 +108,7 @@ class Watcher(object):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Capture training data')
+    parser = argparse.ArgumentParser(description='Capture training data, press and hold t to stop recording')
     parser.add_argument("identifier", type=str, help='An identifier for training data file')
     parser.add_argument("--exp-record",
         help="Experimental recorder uses keyboard directly on main loop instead of win32api", action="store_true")

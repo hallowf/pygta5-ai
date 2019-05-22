@@ -16,7 +16,7 @@ class MainframeTFLearn(object):
         self.lr = lr
         # create model name and training data name
         self.training_data_name = "training/training_data_%s_balanced.npy" % identifier
-        self.model_name = "trained_models/%s_%s_%s.h5" % (self.network_type, self.optimizer, identifier)
+        self.model_name = "trained_models/%s_%s_%s.h5" % (identifier, self.network_type, self.lr)
         # load the training_data
         self.load_training_data = load_training_data()
 

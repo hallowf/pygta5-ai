@@ -1,6 +1,5 @@
 import os, sys
 import keras
-from keras.models import load_model
 from keras.optimizers import Adam, SGD, Adamax, Adadelta, Adagrad, RMSprop, Nadam
 from sklearn.model_selection import train_test_split
 import numpy as np

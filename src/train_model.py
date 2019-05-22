@@ -40,15 +40,13 @@ class Trainer(object):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Capture training data")
+    parser = argparse.ArgumentParser(description="Trains a model with the data provided")
     parser.add_argument("backend", type=str, help="Backend to use keras or tfl")
     parser.add_argument("identifier", type=str, help="An identifier for training data file")
     parser.add_argument("network", type=str, help="Model to build check instructions.md for available modules")
     parser.add_argument("--optimizer", type=str, help="Optimizer to user with keras models only")
     parser.add_argument("--learning-rate", type=float, help="Learning rate for model currently only used by tflearn")
     args = parser.parse_args()
-    print(args.optimizer)
-    sys.exit(0)
     try:
         if args.optimizer:
             Trainer(args.backend,args.identifier, args.network,optimizer=args.optimizer).run_backend()
