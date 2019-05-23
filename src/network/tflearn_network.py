@@ -53,7 +53,7 @@ class MainframeTFLearn(object):
         # tensorboard data callback <- does not work with tflearn
         # tbCallBack = keras.callbacks.TensorBoard(log_dir=graph_dir, histogram_freq=0, write_graph=True, write_images=True)
 
-        model.fit({'input': X}, {'targets': Y}, n_epoch=60, validation_set=({'input': test_x}, {'targets': test_y}),
+        model.fit({'input': X}, {'targets': Y}, n_epoch=30, validation_set=({'input': test_x}, {'targets': test_y}),
                     snapshot_step=500, show_metric=True)
         # keras like
         # model.fit(X, Y, batch_size=20, epochs=30, validation_data=(test_x, test_y), callbacks=[tbCallBack])

@@ -93,7 +93,7 @@ class MainframeKeras(object):
         # tensorboard data callback
         tbCallBack = keras.callbacks.TensorBoard(log_dir=graph_dir, histogram_freq=0, write_graph=True, write_images=True)
 
-        model.fit(X, Y, batch_size=20, epochs=30, validation_data=(test_x, test_y), callbacks=[tbCallBack])
+        model.fit(X, Y, batch_size=60, epochs=30, validation_data=(test_x, test_y), callbacks=[tbCallBack])
 
         if not os.path.isdir("trained_models"):
             os.mkdir("trained_models")
