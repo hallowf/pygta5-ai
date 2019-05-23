@@ -21,8 +21,10 @@ class KModelBuilder(object):
         if network_type not in list(self.models.keys()):
             raise InvalidNetworkType("Unknown network_type: %s" % network_type)
 
-    def return_model():
-        return self.models[self.network_type](self.input_shape)
+    def return_model(self):
+        model = self.models[self.network_type](self.input_shape)
+        print(model.summary())
+        return model
 
     def build_VGG(self, input_shape):
         model = Sequential()

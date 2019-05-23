@@ -21,7 +21,7 @@ class Balancer(object):
         self.final_name = "training/training_data_{}_balanced.npy".format(self.identifier)
         self.training_data = None
         self.df = None
-        self.check_dataframe()
+        # self.check_dataframe()
 
     def check_training_data(self):
         if os.path.isfile(self.file_name):

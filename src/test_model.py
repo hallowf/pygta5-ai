@@ -97,7 +97,7 @@ class Player(object):
             if not paused:
                 # 800x600 windowed mode
                 #screen =  np.array(ImageGrab.grab(bbox=(0,40,800,640)))
-                screen = np.array(sct.grab((0,40,800,640)))
+                screen = np.array(sct.grab((0,40,800,640))) / 255
                 # print('loop took {} seconds'.format(time.time()-last_time))
                 last_time = time.time()
                 screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)

@@ -70,10 +70,18 @@ class MainframeKeras(object):
         test = self.training_data[-500:]
 
         # Split data
-        X = np.array([i[0] for i in train]).reshape(-1, img_x, img_y, 1)
-        Y = [i[1] for i in train]
-        test_x = np.array([i[0] for i in test]).reshape(-1, img_x, img_y, 1)
-        test_y = [i[1] for i in test]
+        X = np.array([i[0] for i in train]).reshape(-1, img_x, img_y, 1) / 255
+        # print(X.shape)
+        # print(X[0])
+        # print(X[0].shape)
+        sys.exit(0)
+        Y = np.array([i[1] for i in train])
+        # print(Y.shape)
+        # print(Y[0])
+        # print(Y[0].shape)
+        # BUG: NORMALIZE the images
+        test_x = np.array([i[0] for i in test]).reshape(-1, img_x, img_y, 1) / 255
+        test_y = np.array([i[1] for i in test])
 
         # compile the model
         model.compile(loss="categorical_crossentropy", optimizer=self.optzr, metrics=['accuracy'])
@@ -98,10 +106,21 @@ class MainframeKeras(object):
 
     # TODO:  maybe split data using train_test_split but this code below is broken
     def old_start(self):
+        img_x, img_y = 160, 120
+        input_shape = (img_x, img_y, 1)
+        model = KModelBuilder(input_shape,self.network_type).return_model()
+
+        # train and test data
+        train = self.training_data[:-500]
+        test = self.training_data[-500:]
+
+        # Split data
+        X = np.array([i[0] for i in train]).reshape(-1, img_x, img_y, 1)
+        # X = np.array([i[0][np.newaxis, :, :, np.newaxis] for i in train])
+        Y = [i[1] for i in train]
+
         # split into test and train set
-        x_train, x_test, y_train, y_test = train_test_split(self.x, self.y, test_size=.2, random_state=5)
-
-
+        x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=.2, random_state=5)
 
         # convert class vectors to binary class matrices for use in categorical_crossentropy loss below
         # number of action classifications, look for # Bug: in __init__
@@ -109,7 +128,6 @@ class MainframeKeras(object):
         y_test = keras.utils.to_categorical(y_test, self.classifications)
 
         # Load model and optimizer based on user input
-        model = ModelBuilder(input_shape,self.network_type).return_model()
 
         model.compile(loss="categorical_crossentropy", optimizer=self.optzr, metrics=['accuracy'])
 
@@ -117,9 +135,9 @@ class MainframeKeras(object):
         if not os.path.isdir(graph_dir):
             os.makedirs(graph_dir, exist_ok=True)
         # tensorboard data callback
-        tbCallBack = keras.callbacks.TensorBoard(log_dir=graph_dir, histogram_freq=0, write_graph=True, write_images=True)
+        # tbCallBack = keras.callbacks.TensorBoard(log_dir=graph_dir, histogram_freq=0, write_graph=True, write_images=True)
 
-        model.fit(x_train, y_train, batch_size=20, epochs=30, validation_data=(x_test, y_test), callbacks=[tbCallBack])
+        model.fit(x_train, y_train, batch_size=20, epochs=30, validation_data=(x_test, y_test))
         if not os.path.isdir("trained_models"):
             os.mkdir("trained_models")
         # Build name: networkType_optimizer_set(X)_trainingData.h5

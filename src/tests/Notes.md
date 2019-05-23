@@ -1,4 +1,12 @@
 ## Notes
+
+
+#### normalization keras
+And remember to do /255 when you grab an image for prediction as well
+Normalizing is scaling data to fit in range of -1 to 1 which is the best for those types of neural networks
+
+#### capture
+
 `FPS = 1 / frame loop`
 
 

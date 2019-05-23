@@ -15,7 +15,7 @@ class TFModelBuilder(object):
         lr: learning_rate=float"""
 
     def __init__(self, input_shape=(160,120), network_type="alexnetv2", lr=1e-3):
-        super(ModelBuilder, self).__init__()
+        super(TFModelBuilder, self).__init__()
         self.network_type = network_type
         width, height = input_shape
         self.width = width

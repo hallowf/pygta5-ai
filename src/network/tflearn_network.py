@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import keras
 
@@ -18,7 +19,7 @@ class MainframeTFLearn(object):
         self.training_data_name = "training/training_data_%s_balanced.npy" % identifier
         self.model_name = "trained_models/%s_%s_%s.h5" % (identifier, self.network_type, self.lr)
         # load the training_data
-        self.load_training_data = load_training_data()
+        self.load_training_data()
 
     def load_training_data(self):
         """Loads training data and raises MissingDataSet
@@ -32,7 +33,7 @@ class MainframeTFLearn(object):
         ## input image dimensions
         img_x, img_y = 160, 120
         input_shape = (img_x,img_y)
-        model = TFModelBuilder(input_shape,self.network_type, self.lr)
+        model = TFModelBuilder(input_shape,self.network_type, self.lr).return_model()
 
         # train and test data
         train = self.training_data[:-500]
@@ -49,11 +50,11 @@ class MainframeTFLearn(object):
         if not os.path.isdir(graph_dir):
             os.makedirs(graph_dir, exist_ok=True)
 
-        # tensorboard data callback <- will this work with tflearn
-        tbCallBack = keras.callbacks.TensorBoard(log_dir=graph_dir, histogram_freq=0, write_graph=True, write_images=True)
+        # tensorboard data callback <- does not work with tflearn
+        # tbCallBack = keras.callbacks.TensorBoard(log_dir=graph_dir, histogram_freq=0, write_graph=True, write_images=True)
 
         model.fit({'input': X}, {'targets': Y}, n_epoch=60, validation_set=({'input': test_x}, {'targets': test_y}),
-                    snapshot_step=500, show_metric=True, callbacks=[tbCallBack])
+                    snapshot_step=500, show_metric=True)
         # keras like
         # model.fit(X, Y, batch_size=20, epochs=30, validation_data=(test_x, test_y), callbacks=[tbCallBack])
 
