@@ -74,7 +74,6 @@ class MainframeKeras(object):
         # print(X.shape)
         # print(X[0])
         # print(X[0].shape)
-        sys.exit(0)
         Y = np.array([i[1] for i in train])
         # print(Y.shape)
         # print(Y[0])
