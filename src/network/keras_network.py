@@ -24,11 +24,12 @@ class MainframeKeras(object):
         # create model name and trainind data name
         self.training_data = None
         self.training_data_name = "training/training_data_%s_balanced.npy" % identifier
-        self.model_name = "trained_models/%s_%s_%s.h5" % (identifier,self.network_type, self.optimizer)
+        self.model_name = "trained_models/%s_%s_%s.h5" % (identifier,self.network_type, optimizer)
         # load the training_data
-        self.load_training_data = load_training_data()
+        self.load_training_data()
         # Map the optimizer and get rid of the others
         self.optzr = self.map_optimizer(optimizer)
+        self.optimizer = optimizer
 
     def load_training_data(self):
         """Loads training data and raises MissingDataSet
@@ -51,7 +52,7 @@ class MainframeKeras(object):
             "Adamax": Adamax(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0),
             "Nadam": Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=None, schedule_decay=0.004)
         }
-        if optimizer not in list(self.optimizers.keys()):
+        if optimizer not in list(optimizers.keys()):
             raise InvalidOptimizer("%s" % optimizer)
         else:
             optimizer = optimizers[optimizer]
