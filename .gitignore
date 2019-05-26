@@ -5,3 +5,5 @@ env
 .h5
 Graph
 training
+trained_models
+*.lprof

@@ -7,3 +7,5 @@ tflearn
 keras
 tensorflow
 scikit-learn
+memory_profiler
+matplotlib
