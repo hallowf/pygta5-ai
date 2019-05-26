@@ -17,3 +17,8 @@ class InvalidNetworkType(Exception):
 class InvalidBackend(Exception):
     def __init__(self,*args,**kwargs):
         Exception.__init__(self,*args,**kwargs)
+
+
+class CrashingRisk(Exception):
+    def __init__(self,*args,**kwargs):
+        Exception.__init__(self,*args,**kwargs)
