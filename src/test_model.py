@@ -1,10 +1,9 @@
 # test_model.py
 
-import time, os, argparse
+import time, os, argparse, sys
 import numpy as np
 from keras.models import load_model
 import cv2
-from alexnet import alexnet
 import keyboard
 import random
 import mss
@@ -22,6 +21,7 @@ class Player(object):
     def __init__(self, backend, identifier, network_type, input_shape=(160,120), *args, **kwargs):
         super(Player, self).__init__()
         self.t_time = 0.09
+        keyboard.add_hotkey("ctrl+q", self.exit_trigger, args=[])
         backends = ["keras", "tfl"]
         if backend not in backends:
             raise InvalidBackend("Unknown backend %s" % backend)
@@ -38,22 +38,25 @@ class Player(object):
         self.model = None
         self.load_trained_model()
 
+    def exit_trigger(self):
+        self.stop_running = True
+
     def load_trained_model(self):
         self.load_training_data()
-        if backend == "keras":
+        if self.backend == "keras":
             self.model = load_model(self.model_name)
         else:
             self.model = TFModelBuilder(self.input_shape, self.network_type, self.lr)
             self.model.load(self.model_name)
 
     def load_training_data(self):
-        if backend == "keras":
+        if self.backend == "keras":
             optzr = self.optzr or "Adam"
-            self.model_name = "trained_models/%s_%s_%s.h5" % (identifier,
+            self.model_name = "trained_models/%s_%s_%s.h5" % (self.identifier,
                 self.network_type, optzr)
         else:
             lr = self.lr or 1e-3
-            self.model_name = "trained_models/%s_%s_%s.h5" % (identifier,
+            self.model_name = "trained_models/%s_%s_%s.h5" % (self.identifier,
                 self.network_type, lr)
         if not os.path.isfile(self.model_name):
             raise MissingDataSet("Couldn't find %s" % self.model_name)
@@ -86,13 +89,18 @@ class Player(object):
 
     def play_keras(self):
         sct = mss.mss()
+
         # last_time = time.time()
+
         for i in list(range(4))[::-1]:
             print(i+1)
             time.sleep(1)
 
         paused = False
         while(True):
+            if self.stop_running:
+                print("Closing")
+                break
 
             if not paused:
                 # 800x600 windowed mode
@@ -102,47 +110,9 @@ class Player(object):
                 last_time = time.time()
                 screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
                 screen = cv2.resize(screen, (160,120))
+                screen = screen.reshape(-1,160,120,1)
 
                 prediction = self.model.predict(screen)[0]
-                print(prediction)
-
-                turn_thresh = .75
-                fwd_thresh = 0.70
-
-                if prediction[1] > fwd_thresh:
-                    straight()
-                elif prediction[0] > turn_thresh:
-                    left()
-                elif prediction[2] > turn_thresh:
-                    right()
-                else:
-                    straight()
-
-            if keyboard.is_pressed("t"):
-                paused = True if not paused else False
-                time.sleep(5)
-                os.system("clear")
-
-    def play_tfl(self):
-        sct = mss.mss()
-        # last_time = time.time()
-        for i in list(range(4))[::-1]:
-            print(i+1)
-            time.sleep(1)
-
-        paused = False
-        while(True):
-
-            if not paused:
-                # 800x600 windowed mode
-                #screen =  np.array(ImageGrab.grab(bbox=(0,40,800,640)))
-                screen = np.array(sct.grab((0,40,800,640)))
-                # print('loop took {} seconds'.format(time.time()-last_time))
-                last_time = time.time()
-                screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
-                screen = cv2.resize(screen, (160,120))
-
-                prediction = self.model.predict([screen.reshape(160,120,1)])[0]
                 print(prediction)
 
                 turn_thresh = .75
@@ -162,7 +132,53 @@ class Player(object):
                 time.sleep(5)
                 os.system("clear")
 
-    def run():
+    def play_tfl(self):
+        sct = mss.mss()
+        # last_time = time.time()
+        for i in list(range(4))[::-1]:
+            print(i+1)
+            time.sleep(1)
+
+        paused = False
+        while(True):
+            if self.stop_running:
+                print("Closing")
+                break
+
+            if not paused:
+                # 800x600 windowed mode
+                #screen =  np.array(ImageGrab.grab(bbox=(0,40,800,640)))
+                screen = np.array(sct.grab((0,40,800,640)))
+                # print('loop took {} seconds'.format(time.time()-last_time))
+                last_time = time.time()
+                screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+                screen = cv2.resize(screen, (160,120))
+                screen = screen.reshape(-1,160,120,1)
+
+                prediction = self.model.predict(screen)[0]
+                print(prediction)
+
+                turn_thresh = .75
+                fwd_thresh = 0.70
+
+                if prediction[1] > fwd_thresh:
+                    self.straight()
+                elif prediction[0] > turn_thresh:
+                    self.left()
+                elif prediction[2] > turn_thresh:
+                    self.right()
+                else:
+                    self.straight()
+
+
+
+            if keyboard.is_pressed("t"):
+                paused = True if not paused else False
+                print("Cleaning stdout")
+                time.sleep(5)
+                os.system("clear")
+
+    def run(self):
         if self.backend == "keras":
             self.play_keras()
         else:
