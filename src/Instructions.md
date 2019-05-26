@@ -1,3 +1,6 @@
+## concatenate data
+np.concatenate([a, b])
+
 ## Cli params
 parameters that start with `--` are optional
 
