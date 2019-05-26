@@ -1,6 +1,28 @@
 ## Notes
 
 
+#### Pickle instead of np.load/save
+
+pickle seems like a viable solution and does consume slightly less memory and probably execution time,
+however there seems to be something off
+below if importing the data with pickle and np, np.array_equal(a,b) returns false, however iterating trough the arrays and comparing the shapes there seems to be no difference
+
+    >>> import pickle
+    >>> import numpy as np
+    >>> a = pickle.load(open("training/training_data_test.npy", "rb"))
+    >>> b = np.load("training/training_data_test.npy")
+    >>> np.array_equal(a,b)
+    False
+    >>> for c in a:
+    ...     for d in b:
+    ...             if (c[0].shape==d[0].shape):
+    ...                     ba.append(True)
+    ...             else:
+    ...                     ba.append(False)
+    ...
+    >>> print(False in ba)
+    False
+
 
 #### line_profiler
 `kernprof.py -v -l <script> <your_script_args>`.
@@ -21,6 +43,8 @@ gtd = get_training_data
 #### normalization keras
 And remember to do /255 when you grab an image for prediction as well
 Normalizing is scaling data to fit in range of -1 to 1 which is the best for those types of neural networks
+
+### Performance
 
 #### capture
 
@@ -155,7 +179,7 @@ Normalizing is scaling data to fit in range of -1 to 1 which is the best for tho
        156                                                                       self.split_data()
 
 
-#### Other notes
+### Other notes
 
 1. Both mss and win32 api seems to have the same performance mss probably uses win32api on windows
 2. Keyboard inspite having the known limitation: `Other applications, such as some games, may register hooks that swallow all key events. In this case keyboard will be unable to report events`
