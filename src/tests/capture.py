@@ -1,9 +1,13 @@
-import time, timeit
+import time, timeit, sys, os
 import mss
+import keyboard
 import cv2
 import numpy as np
 import win32gui, win32ui, win32con, win32api
 from statistics import mean
+
+# from memory_profiler import profile
+from utils import UserInterrupt, h_profile
 
 
 class CrabScreen(object):
@@ -148,8 +152,41 @@ def mss_test():
     cv2.destroyAllWindows()
     # print(mean(vals))
 
+
+
+
+# @h_profile
+@profile
+def capture_memory_test():
+    print("Starting")
+    sct = mss.mss()
+    training_data = []
+    file_name = "test_capture.npy"
+    for i in list(range(5000))[::-1]:
+        output = [0,0,0]
+        screen = np.array(sct.grab((0,40,800,640)))
+        screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+        screen = cv2.resize(screen, (160,120))
+        if keyboard.is_pressed("a"):
+            output = [1,0,0]
+        elif keyboard.is_pressed("w"):
+            output = [0,1,0]
+        elif keyboard.is_pressed("d"):
+            output = [0,0,1]
+        else:
+            output = [0,0,0]
+        training_data.append([screen, output])
+        if len(training_data) % 1000 == 0:
+            print("Saving data")
+            np.save(file_name, training_data)
+
+
 if __name__ == '__main__':
-    winapi_test()
-    # winapi_Crab_test()
-    # mss_test()
-    # print(timeit.timeit("winapi_timeit_test()", number=3, setup="from __main__ import winapi_timeit_test"))
+    try:
+        capture_memory_test()
+        # winapi_test()
+        # winapi_Crab_test()
+        # mss_test()
+        # print(timeit.timeit("winapi_timeit_test()", number=3, setup="from __main__ import winapi_timeit_test"))
+    except Exception as e:
+        raise e
