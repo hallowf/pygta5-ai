@@ -1,4 +1,4 @@
-import time, timeit, sys, os
+import time, timeit, sys, os, json, requests
 import mss
 import keyboard
 import cv2
@@ -156,7 +156,7 @@ def mss_test():
 
 
 # @h_profile
-@profile
+# @profile
 def capture_memory_test():
     print("Starting")
     sct = mss.mss()
@@ -181,9 +181,35 @@ def capture_memory_test():
             np.save(file_name, training_data)
 
 
+def api_send_test():
+    sct = mss.mss()
+    for i in list(range(5000))[::-1]:
+        lst = time.perf_counter()
+        print("last",lst)
+        output = [0,0,0]
+        screen = np.array(sct.grab((0,40,800,640)))
+        screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+        screen = cv2.resize(screen, (160,120))
+        if keyboard.is_pressed("a"):
+            output = [1,0,0]
+        elif keyboard.is_pressed("w"):
+            output = [0,1,0]
+        elif keyboard.is_pressed("d"):
+            output = [0,0,1]
+        else:
+            output = [0,0,0]
+        payload = {
+            "screen": screen.tolist(),
+            "output": output,
+            "time": lst
+        }
+        r = requests.post("http://192.168.1.20:2890/gta-api", json=payload)
+        print(r.text)
+
+
 if __name__ == '__main__':
     try:
-        capture_memory_test()
+        api_send_test()
         # winapi_test()
         # winapi_Crab_test()
         # mss_test()
