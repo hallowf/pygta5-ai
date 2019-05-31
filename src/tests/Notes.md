@@ -31,7 +31,7 @@ below if importing the data with pickle and np, np.array_equal(a,b) returns fals
 #### memory_profiler
 [pypi](https://pypi.org/project/memory-profiler/)
 
-#### mprof
+##### mprof
 mprof run python -m memory_profiler get_training_data.py test --s int
 
 mprof plot gtd_function_maxTrainDataLen
@@ -184,3 +184,4 @@ Normalizing is scaling data to fit in range of -1 to 1 which is the best for tho
 1. Both mss and win32 api seems to have the same performance mss probably uses win32api on windows
 2. Keyboard inspite having the known limitation: `Other applications, such as some games, may register hooks that swallow all key events. In this case keyboard will be unable to report events`
   it still seems to work with gta5
+3. Websockets seem to really fast sending data

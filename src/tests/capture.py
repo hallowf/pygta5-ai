@@ -1,5 +1,6 @@
-import time, timeit, sys, os, json, requests
+import time, timeit, sys, os, json, socket, pickle
 import mss
+import requests
 import keyboard
 import cv2
 import numpy as np
@@ -8,7 +9,6 @@ from statistics import mean
 
 # from memory_profiler import profile
 from utils import UserInterrupt, h_profile
-
 
 class CrabScreen(object):
     """preserving the handles?"""
@@ -50,7 +50,6 @@ class CrabScreen(object):
         self.bmp = None
         return img
 
-
 def grab_screen(region=(0,40,800,640)):
 
     hwin = win32gui.GetDesktopWindow()
@@ -77,7 +76,6 @@ def grab_screen(region=(0,40,800,640)):
     win32gui.DeleteObject(bmp.GetHandle())
 
     return img
-
 
 def winapi_Crab_test():
     sct = CrabScreen()
@@ -118,12 +116,10 @@ def winapi_test():
     cv2.destroyAllWindows()
     # print(mean(vals))
 
-
 def winapi_timeit_test():
     print("winapi timeit test")
     for i in list(range(200))[::-1]:
         screen_pil = np.array(grab_screen())
-
 
 def mss_timeit_test():
     print("mss timeit test")
@@ -152,9 +148,6 @@ def mss_test():
     cv2.destroyAllWindows()
     # print(mean(vals))
 
-
-
-
 # @h_profile
 # @profile
 def capture_memory_test():
@@ -180,7 +173,6 @@ def capture_memory_test():
             print("Saving data")
             np.save(file_name, training_data)
 
-
 def api_send_test():
     sct = mss.mss()
     for i in list(range(5000))[::-1]:
@@ -203,13 +195,100 @@ def api_send_test():
             "output": output,
             "time": lst
         }
-        r = requests.post("http://192.168.1.20:2890/gta-api", json=payload)
+        r = requests.post("http://127.0.0.1:2890/gta-api", json=payload)
         print(r.text)
 
+def websocket_server_test():
+    def wait_loop(cs):
+        msg = cs.recv(1024)
+        if msg == b"ok":
+            return True
+        else:
+            return False
+    sct = mss.mss()
+    HEADERSIZE = 10
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 2890))
+        s.listen(5)
+        while True:
+            cs, addr = s.accept()
+            for i in list(range(700))[::-1]:
+                lst = time.time()
+                output = [0,0,0]
+                screen = np.array(sct.grab((0,40,800,640)))
+                screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+                screen = cv2.resize(screen, (160,120))
+                if keyboard.is_pressed("a"):
+                    output = [1,0,0]
+                elif keyboard.is_pressed("w"):
+                    output = [0,1,0]
+                elif keyboard.is_pressed("d"):
+                    output = [0,0,1]
+                else:
+                    output = [0,0,0]
+                payload = {
+                    "screen": screen.tolist(),
+                    "output": output,
+                    "time": lst
+                }
+                payload = pickle.dumps(payload)
+                payload = bytes(f'{len(payload):<{HEADERSIZE}}', "utf-8") + payload
+                cs.send(payload)
+                print("Data sent")
+                while not wait_loop(cs):
+                    print("Waiting for response")
+                    time.sleep(0.1)
+                print("Response received")
+                print("TIME:", time.time()-lst)
+            break
+
+def websocket_client_test():
+    def wait_loop(s):
+        msg = s.recv(1024)
+        if msg == b"ok":
+            return True
+        else:
+            return False
+    sct = mss.mss()
+    HEADERSIZE = 10
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect(("127.0.0.1", 2890))
+        while True:
+            for i in list(range(1000))[::-1]:
+                lst = time.time()
+                output = [0,0,0]
+                screen = np.array(sct.grab((0,40,800,640)))
+                screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+                screen = cv2.resize(screen, (160,120))
+                if keyboard.is_pressed("a"):
+                    output = [1,0,0]
+                elif keyboard.is_pressed("w"):
+                    output = [0,1,0]
+                elif keyboard.is_pressed("d"):
+                    output = [0,0,1]
+                else:
+                    output = [0,0,0]
+                payload = {
+                    "screen": screen.tolist(),
+                    "output": output
+                }
+                payload = pickle.dumps(payload)
+                payload = bytes(f'{len(payload):<{HEADERSIZE}}', "utf-8") + payload
+                s.sendall(payload)
+                print("Data sent")
+                while not wait_loop(s):
+                    print("Waiting for response")
+                    time.sleep(0.1)
+                print("Response received")
+                print("TIME:", time.time()-lst)
+            break
 
 if __name__ == '__main__':
     try:
-        api_send_test()
+        # NOTE: sockets seems to be really fast
+        websocket_client_test()
+        # websocket_server_test()
+        # api_send_test()
         # winapi_test()
         # winapi_Crab_test()
         # mss_test()
