@@ -1,11 +1,15 @@
 opencv-python
 pandas
 numpy==1.16.1
-mss
-keyboard
 tflearn
 keras
 tensorflow
 scikit-learn
-memory_profiler
 matplotlib
+# not required but helpfull
+requests
+mss
+keyboard
+# memory_profiler
+# required for screenshots but mss works fine
+# pywin32
