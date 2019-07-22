@@ -11,6 +11,7 @@ below if importing the data with pickle and np, np.array_equal(a,b) returns fals
     >>> import numpy as np
     >>> a = pickle.load(open("training/training_data_test.npy", "rb"))
     >>> b = np.load("training/training_data_test.npy")
+    >>> ba = []
     >>> np.array_equal(a,b)
     False
     >>> for c in a:
@@ -29,14 +30,14 @@ below if importing the data with pickle and np, np.array_equal(a,b) returns fals
 `python -m line_profiler <data_file>`
 
 #### memory_profiler
-[pypi](https://pypi.org/project/memory-profiler/)
+[memory_profiler pypi page](https://pypi.org/project/memory-profiler/)
 
 ##### mprof
-mprof run python -m memory_profiler get_training_data.py test --s int
+`mprof run python -m memory_profiler get_training_data.py test --s int`
 
-mprof plot gtd_function_maxTrainDataLen
+`mprof plot gtd_function_maxTrainDataLen`
 
-gtd = get_training_data
+* \*gtd == get_training_data
 
 
 
@@ -72,7 +73,21 @@ Normalizing is scaling data to fit in range of -1 to 1 which is the best for tho
     win32api 15
 
 
-### memory and speed
+#### Sockets and api
+
+the code required can be found [here](https://github.com/hallowf/pygta5-ai-api)
+
+Sockets seem to be pretty fast to send data and avoid keeping the data locally but this means the data needs to be handled on the other side
+
+The server example can be found in src/tests/socket/
+
+      websocket_client_test
+      High: 0.257015
+      Low: 0.007000
+      Mean: 0.010582
+
+
+#### memory and speed
 
 ##### capture_memory_test() with 5000 len and save at 1000
     Line #      Hits         Time  Per Hit   % Time  Line Contents
@@ -185,3 +200,7 @@ Normalizing is scaling data to fit in range of -1 to 1 which is the best for tho
 2. Keyboard inspite having the known limitation: `Other applications, such as some games, may register hooks that swallow all key events. In this case keyboard will be unable to report events`
   it still seems to work with gta5
 3. Websockets seem to really fast sending data
+4. Capturing data and saving it to a file locally is inneficient if not done properly
+ - the main thread hangs and sometimes it might lag your system depending on the data lenght and your hardware
+ - however sending the data over the network with a post request or a socket would leave that problem to the other computer
+  * this might bring some issues if the socket / api hangs but if the client handles those cases it's still a viable option

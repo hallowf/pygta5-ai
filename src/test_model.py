@@ -33,6 +33,7 @@ class Player(object):
         self.height = height
         self.input_shape = input_shape
         self.backend = backend
+        self.stop_running = False
         self.identifier = identifier
         self.model_name = None
         self.model = None
@@ -46,7 +47,8 @@ class Player(object):
         if self.backend == "keras":
             self.model = load_model(self.model_name)
         else:
-            self.model = TFModelBuilder(self.input_shape, self.network_type, self.lr)
+            self.model = TFModelBuilder(self.input_shape, self.network_type, 
+self.lr).return_model()
             self.model.load(self.model_name)
 
     def load_training_data(self):
@@ -58,8 +60,8 @@ class Player(object):
             lr = self.lr or 1e-3
             self.model_name = "trained_models/%s_%s_%s.h5" % (self.identifier,
                 self.network_type, lr)
-        if not os.path.isfile(self.model_name):
-            raise MissingDataSet("Couldn't find %s" % self.model_name)
+        #if not os.path.isfile(self.model_name):
+            #raise MissingDataSet("Couldn't find %s" % self.model_name)
 
     def straight(self):
     ##    if random.randrange(4) == 2:
@@ -105,7 +107,7 @@ class Player(object):
             if not paused:
                 # 800x600 windowed mode
                 #screen =  np.array(ImageGrab.grab(bbox=(0,40,800,640)))
-                screen = np.array(sct.grab((0,40,800,640))) / 255
+                screen = np.array(sct.grab((0,40,800,640)))
                 # print('loop took {} seconds'.format(time.time()-last_time))
                 last_time = time.time()
                 screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)

@@ -1,4 +1,4 @@
-import time, timeit, sys, os, json, socket, pickle
+import time, timeit, sys, os, json, socket, pickle, random
 import mss
 import requests
 import keyboard
@@ -242,7 +242,16 @@ def websocket_server_test():
                 print("TIME:", time.time()-lst)
             break
 
+
+
+
 def websocket_client_test():
+    names = ["test%s" % i for i in range(25)]
+    user_id = random.choice(names)
+    time_mean = 0
+    lowest = 0.9
+    highest = 0.01
+    time_list = []
     def wait_loop(s):
         msg = s.recv(1024)
         if msg == b"ok":
@@ -251,37 +260,55 @@ def websocket_client_test():
             return False
     sct = mss.mss()
     HEADERSIZE = 10
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect(("127.0.0.1", 2890))
-        while True:
-            for i in list(range(1000))[::-1]:
-                lst = time.time()
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(("127.0.0.1",2890))
+    # receive functionality won't be blocking
+    # client_socket.setblocking(False)
+    id_header = bytes(f'{len(user_id):<{HEADERSIZE}}', "utf-8")
+    id = bytes(user_id, "utf-8")
+    client_socket.send(id_header+id)
+    print("Starting in 3 seconds")
+    time.sleep(3)
+    while True:
+        for i in list(range(2000))[::-1]:
+            lst = time.time()
+            output = [0,0,0]
+            screen = np.array(sct.grab((0,40,800,640)))
+            screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+            screen = cv2.resize(screen, (160,120))
+            if keyboard.is_pressed("a"):
+                output = [1,0,0]
+            elif keyboard.is_pressed("w"):
+                output = [0,1,0]
+            elif keyboard.is_pressed("d"):
+                output = [0,0,1]
+            else:
                 output = [0,0,0]
-                screen = np.array(sct.grab((0,40,800,640)))
-                screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
-                screen = cv2.resize(screen, (160,120))
-                if keyboard.is_pressed("a"):
-                    output = [1,0,0]
-                elif keyboard.is_pressed("w"):
-                    output = [0,1,0]
-                elif keyboard.is_pressed("d"):
-                    output = [0,0,1]
-                else:
-                    output = [0,0,0]
-                payload = {
-                    "screen": screen.tolist(),
-                    "output": output
-                }
-                payload = pickle.dumps(payload)
-                payload = bytes(f'{len(payload):<{HEADERSIZE}}', "utf-8") + payload
-                s.sendall(payload)
-                print("Data sent")
-                while not wait_loop(s):
-                    print("Waiting for response")
-                    time.sleep(0.1)
-                print("Response received")
-                print("TIME:", time.time()-lst)
-            break
+            payload = {
+                "screen": screen.tolist(),
+                "output": output
+            }
+            payload = pickle.dumps(payload)
+            payload = bytes(f'{len(payload):<{HEADERSIZE}}', "utf-8") + payload
+            # print("len payload",len(payload))
+            client_socket.send(payload)
+            print("Data sent")
+            while not wait_loop(client_socket):
+                print("Waiting for response")
+                time.sleep(0.01)
+            print("Response received")
+            lst = time.time()-lst
+            time_list.append(lst)
+            if lst < lowest:
+                lowest = lst
+            if lst > highest:
+                highest = lst
+            print("TIME:", lst)
+        break
+    # check mean
+    time_mean = float(mean(time_list))
+    values = "\nHigh: %f\nLow: %f\nMean: %f" % (highest, lowest, time_mean)
+    print(values)
 
 if __name__ == '__main__':
     try:
